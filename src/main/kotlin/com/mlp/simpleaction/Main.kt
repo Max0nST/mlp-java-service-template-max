@@ -1,35 +1,36 @@
 package com.mlp.simpleaction
 
-import com.mlp.sdk.MlpExecutionContext.Companion.systemContext
+import com.mlp.sdk.MlpException
+import com.mlp.sdk.MlpExecutionContext
+import com.mlp.sdk.MlpPredictServiceBase
 import com.mlp.sdk.MlpServiceSDK
-import com.mlp.sdk.utils.JSON.parse
 
-enum class Mode {
-    single,
-    multi
+data class SimpleTestActionRequest(
+    val action: String,
+    val name: String
+)
+
+class SimpleTestAction(
+    override val context: MlpExecutionContext
+) : MlpPredictServiceBase<SimpleTestActionRequest, String>(REQUEST_EXAMPLE, RESPONSE_EXAMPLE) {
+
+    override fun predict(req: SimpleTestActionRequest): String {
+        return when (req.action) {
+            "hello" -> "Hello ${req.name}!"
+            "envs" -> "Envs: ${context.environment.envsOverride}"
+            else -> throw MlpException("actionUnknownException")
+        }
+    }
+
+    companion object {
+        val REQUEST_EXAMPLE = SimpleTestActionRequest("hello", "World")
+        val RESPONSE_EXAMPLE = "Hello World!"
+    }
 }
 
-data class InitConfigData(val mode: Mode = Mode.single)
-data class FitDatasetData(val map: Map<String, String>)
-data class FitConfigData(val upper: Boolean)
-data class PredictRequestData(val text: String)
-data class PredictResponseData(val text: String)
-
 fun main() {
-    val initConfig = parse<InitConfigData>(systemContext.environment["SERVICE_CONFIG"] ?: """{"mode":"single"}""")
-    val service =
-        when (initConfig.mode) {
-            Mode.single -> SingleFit(systemContext)
-            Mode.multi ->
-                if (systemContext.environment["MLP_STORAGE_DIR"].isNullOrEmpty()) {
-                    FitService(systemContext)
-                } else {
-                    PredictService(systemContext)
-                }
-        }
+    val actionSDK = MlpServiceSDK({ SimpleTestAction(MlpExecutionContext.systemContext) })
 
-    val mlp = MlpServiceSDK(service)
-
-    mlp.start()
-    mlp.blockUntilShutdown()
+    actionSDK.start()
+    actionSDK.blockUntilShutdown()
 }
