@@ -32,8 +32,8 @@ class FitService(
         val FIT_DATA_EXAMPLE = FitDatasetData(mapOf("first" to "1"))
         val FIT_CONFIG_EXAMPLE = FitConfigData(true)
 
-        val MODEL_FILENAME_DATA = "data.json"
-        val MODEL_FILENAME_CONFIG = "config.json"
+        const val MODEL_FILENAME_DATA = "data.json"
+        const val MODEL_FILENAME_CONFIG = "config.json"
     }
 }
 
@@ -44,11 +44,11 @@ class PredictService(
     private val storage = StorageFactory.getStorage(context)
     private val predictModelDir = StorageFactory.getDefaultStorageDir(context)
 
-    val modelData: FitDatasetData by lazy {
+    private val modelData: FitDatasetData by lazy {
         val modelDataStr = storage.loadState("$predictModelDir/${FitService.MODEL_FILENAME_DATA}")!!
         JSON.parse(modelDataStr, FitDatasetData::class.java)
     }
-    val configData: FitConfigData by lazy {
+    private val configData: FitConfigData by lazy {
         val configDataStr = storage.loadState("$predictModelDir/${FitService.MODEL_FILENAME_CONFIG}")!!
         JSON.parse(configDataStr, FitConfigData::class.java)
     }
