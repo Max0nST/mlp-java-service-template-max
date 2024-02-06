@@ -15,7 +15,7 @@ repositories {
     }
 }
 
-val mlpSdkVersion = "CAILA-2399_nexus-open-repo-SNAPSHOT"
+val mlpSdkVersion = "dev-SNAPSHOT"
 val logbackVersion = "1.2.6"
 
 dependencies {
