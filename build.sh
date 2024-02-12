@@ -4,7 +4,7 @@ ROOT=$(dirname $0)
 cd "$ROOT"
 
 echo "Building project..."
-./gradlew clean build copylibs || exit 1
+mvn clean package || exit 1
 
 SERVICE_NAME=mlp-java-hello-world-service
 BUILD_BRANCH=$(git rev-parse --abbrev-ref HEAD)
